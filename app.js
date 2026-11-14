@@ -8,6 +8,8 @@
 // The sample course data below is invented. The course numbers are real; the units, meeting
 // times, and days are not.
 
+import { timeToMinutes, formatTime, findConflict, summarizeUnits, filterCourses } from "./logic.js";
+
 const DAYS = ["M", "T", "W", "R", "F"];
 const DAY_NAMES = { M: "Mon", T: "Tue", W: "Wed", R: "Thu", F: "Fri" };
 
@@ -52,8 +54,8 @@ function addCourse() {
   }
 
   // turn "09:00" into minutes since midnight so times can be compared
-  const startMinutes = Number(start.slice(0, 2)) * 60 + Number(start.slice(3, 5));
-  const endMinutes = Number(end.slice(0, 2)) * 60 + Number(end.slice(3, 5));
+  const startMinutes = timeToMinutes(start);
+  const endMinutes = timeToMinutes(end);
 
   if (endMinutes <= startMinutes) {
     message.textContent = "The end time has to be after the start time.";
@@ -62,25 +64,11 @@ function addCourse() {
   }
 
   // look for a course on a shared day whose meeting time overlaps this one
-  for (const course of courses) {
-    let sharesADay = false;
-    for (const day of days) {
-      if (course.days.includes(day)) {
-        sharesADay = true;
-      }
-    }
-    if (!sharesADay) {
-      continue;
-    }
-
-    const otherStart = Number(course.start.slice(0, 2)) * 60 + Number(course.start.slice(3, 5));
-    const otherEnd = Number(course.end.slice(0, 2)) * 60 + Number(course.end.slice(3, 5));
-
-    if (startMinutes <= otherEnd && otherStart <= endMinutes) {
-      message.textContent = "That conflicts with " + course.number + " (" + course.name + ").";
-      message.className = "message error";
-      return;
-    }
+  const conflict = findConflict({ days: days, start: start, end: end }, courses);
+  if (conflict) {
+    message.textContent = "That conflicts with " + conflict.number + " (" + conflict.name + ").";
+    message.className = "message error";
+    return;
   }
 
   courses.push({ number: number, name: name, units: units, days: days, start: start, end: end });
@@ -106,11 +94,9 @@ function removeCourse(index) {
 function render() {
   const query = document.getElementById("search").value.trim().toLowerCase();
 
-  let total = 0;
-  for (const course of courses) {
-    total += course.units;
-  }
-  const over = total > UNIT_LIMIT;
+  const unitSummary = summarizeUnits(courses, UNIT_LIMIT);
+  const total = unitSummary.total;
+  const over = unitSummary.over;
 
   const shown = renderRoster(query);
   renderWeek();
@@ -130,19 +116,17 @@ function renderRoster(query) {
   const rows = document.getElementById("rows");
   rows.innerHTML = "";
   let shown = 0;
+  const matchingCourses = filterCourses(courses, query);
 
   courses.forEach(function (course, index) {
-    const haystack = (course.number + " " + course.name).toLowerCase();
-    if (query && !haystack.includes(query)) {
+    if (!matchingCourses.includes(course)) {
       return;
     }
     shown++;
 
     // show "14:50" to the user as "2:50 PM"
-    const startHour = Number(course.start.slice(0, 2));
-    const endHour = Number(course.end.slice(0, 2));
-    const startLabel = (startHour % 12) + ":" + course.start.slice(3, 5) + (startHour < 12 ? " AM" : " PM");
-    const endLabel = (endHour % 12) + ":" + course.end.slice(3, 5) + (endHour < 12 ? " AM" : " PM");
+    const startLabel = formatTime(course.start);
+    const endLabel = formatTime(course.end);
 
     const tr = document.createElement("tr");
     tr.innerHTML =
@@ -152,7 +136,7 @@ function renderRoster(query) {
       '<td class="days">' + course.days.join("") + "</td>" +
       '<td class="time">' + startLabel + " to " + endLabel + "</td>" +
       '<td class="actions"><button class="btn-remove" title="Remove ' + course.number +
-      '" onclick="removeCourse(' + index + ')">&times;</button></td>';
+      '" data-index="' + index + '">&times;</button></td>';
     rows.appendChild(tr);
   });
 
@@ -191,15 +175,14 @@ function renderWeek() {
         return;
       }
 
-      const startMinutes = Number(course.start.slice(0, 2)) * 60 + Number(course.start.slice(3, 5));
-      const endMinutes = Number(course.end.slice(0, 2)) * 60 + Number(course.end.slice(3, 5));
+      const startMinutes = timeToMinutes(course.start);
+      const endMinutes = timeToMinutes(course.end);
 
       const top = Math.max(0, ((startMinutes - FIRST_HOUR * 60) / 60) * HOUR_PX);
       const height = Math.max(22, ((endMinutes - startMinutes) / 60) * HOUR_PX - 2);
 
       // show "14:50" to the user as "2:50 PM"
-      const startHour = Number(course.start.slice(0, 2));
-      const startLabel = (startHour % 12) + ":" + course.start.slice(3, 5) + (startHour < 12 ? " AM" : " PM");
+      const startLabel = formatTime(course.start);
 
       columns +=
         '<div class="block tint-' + ((index % 5) + 1) + '" style="top:' + top + "px;height:" + height + 'px">' +
@@ -213,3 +196,13 @@ function renderWeek() {
 
   document.getElementById("grid").innerHTML = head + '<div class="week-body">' + gutter + columns + "</div>";
 }
+
+document.getElementById("add-course").addEventListener("click", addCourse);
+document.getElementById("search").addEventListener("input", render);
+document.getElementById("rows").addEventListener("click", function (event) {
+  const button = event.target.closest(".btn-remove");
+  if (button) {
+    removeCourse(Number(button.dataset.index));
+  }
+});
+render();

@@ -58,7 +58,7 @@
             </div>
         </div>
 
-        <button class="btn-primary" onclick="addCourse()">Add course</button>
+        <button id="add-course" class="btn-primary">Add course</button>
         <p id="message" class="message"></p>
     </aside>
 
@@ -76,7 +76,7 @@
             <div class="panel-head">
                 <h2 class="label">Courses</h2>
                 <input id="search" class="search" type="search" autocomplete="off"
-                       placeholder="Filter by number or title" oninput="render()">
+                       placeholder="Filter by number or title">
             </div>
             <table class="roster">
                 <thead>
@@ -106,8 +106,7 @@
     underneath it is correct.</strong></p>
 </footer>
 
-<script src="app.js"></script>
-<script>render();</script>
+<script type="module" src="app.js"></script>
 
 </body>
 </html>
