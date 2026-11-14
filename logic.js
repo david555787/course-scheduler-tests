@@ -38,7 +38,7 @@ export function summarizeUnits(courses, limit) {
   for (const course of courses) {
     total += course.units;
   }
-  const over = total > limit;
+  const over = total >= limit;
 
   return { total: total, over: over };
 }
