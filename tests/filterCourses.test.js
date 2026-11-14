@@ -33,6 +33,10 @@ test("filterCourses matches course titles case-insensitively", () => {
   assert.deepEqual(filterCourses(courses, "dIsCrEtE"), [courses[1]]);
 });
 
+test("filterCourses ignores surrounding whitespace in a query", () => {
+  assert.deepEqual(filterCourses(courses, "  cs 101  "), [courses[0]]);
+});
+
 test("filterCourses returns an empty array when nothing matches", () => {
   assert.deepEqual(filterCourses(courses, "biology"), []);
 });

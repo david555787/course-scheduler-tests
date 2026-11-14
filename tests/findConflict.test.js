@@ -39,6 +39,12 @@ test("findConflict returns null for back-to-back meetings", () => {
   assert.equal(findConflict(candidate, courses), null);
 });
 
+test("findConflict returns null when a candidate ends as another course starts", () => {
+  const candidate = { days: ["M"], start: "08:00", end: "09:00" };
+
+  assert.equal(findConflict(candidate, courses), null);
+});
+
 test("findConflict returns null for overlapping times on different days", () => {
   const candidate = { days: ["T"], start: "09:30", end: "09:45" };
 

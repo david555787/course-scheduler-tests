@@ -24,6 +24,12 @@ test("summarizeUnits marks a total above the limit as over", () => {
   assert.deepEqual(summarizeUnits(courses, 54), { total: 55, over: true });
 });
 
+test("summarizeUnits respects a limit other than 54", () => {
+  const courses = [{ units: 6 }, { units: 5 }];
+
+  assert.deepEqual(summarizeUnits(courses, 10), { total: 11, over: true });
+});
+
 test("summarizeUnits handles fractional and zero-unit courses", () => {
   const courses = [{ units: 4 }, { units: 5.5 }, { units: 0 }];
 
