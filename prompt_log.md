@@ -70,3 +70,59 @@ Task:\
 &#x20;  \- any inline handler, onclick, or global reference to app.js functions that still remains anywhere\
 &#x20;  \- anything you were tempted to change but did not\
 ~~~~
+
+## Entry 3: Add tests from my own specification
+- Tool: Codex desktop app (local, Ask for approval)
+- Model: 5.6 Sol, Medium
+- Purpose: Write tests for five functions in logic.js, with expected values taken from the README rules and my own written list (not from the code), asked to include boundary and error cases. I wrote the first test (timeToMinutes) by hand before this step. The list inside the prompt is my own, translated to English.
+- Prompt:
+
+~~~~
+We are in the repo course-scheduler. The logic lives in logic.js (exports timeToMinutes, formatTime, findConflict, summarizeUnits, filterCourses). I already wrote one test by hand in tests/logic.test.js. This step: add more tests using Node's built-in test runner (node:test and node:assert/strict, no packages).\
+\
+STRICT RULES:\
+\- Create new test files only under tests/. Do NOT modify tests/logic.test.js, logic.js, app.js, index.html, README.md, package.json, or any other file. Do NOT create prompt_log.md.\
+\- Write the expected values from the SPECIFICATION BELOW (README rules and my list), NOT from what logic.js currently returns. Do not read logic.js to decide what the expected value should be.\
+\- If a test fails when you run it, do NOT change the test to match the code, do NOT delete or skip it, and do NOT change logic.js. Leave it failing and report it to me.\
+\- Do NOT run git add, commit, stash, restore, or checkout. I will commit myself.\
+\- Every test needs a descriptive name and at least one assertion that checks an exact value (assert.equal or assert.deepEqual). Do not write tests whose only assertion is that something is not null or did not throw.\
+\- Explicitly cover boundary cases and error/odd-input cases for each function, not only the obvious case. Put each function's tests in its own file, e.g. tests/formatTime.test.js.\
+\
+Interfaces (inputs and return types only):\
+\- timeToMinutes(hhmm) takes a "HH:MM" string and returns a number.\
+\- formatTime(hhmm) takes a "HH:MM" string and returns a string such as "2:50 PM".\
+\- findConflict(candidate, courses) takes candidate = { days: ["M", "W"], start: "HH:MM", end: "HH:MM" } and an array of courses shaped { number, name, units, days, start, end }. It returns the FIRST existing course that conflicts, or null when there is no conflict.\
+\- summarizeUnits(courses, limit) returns { total, over } where total is a number and over is a boolean.\
+\- filterCourses(courses, query) returns an array of the matching course objects.\
+\
+README rules (the specification):\
+\- Times use "HH:MM" internally and 12-hour AM/PM labels for display. Standard 12-hour clock convention applies: midnight is shown as 12:xx AM and noon as 12:xx PM.\
+\- A conflict requires a shared day and overlapping times.\
+\- Back-to-back meetings do not conflict; different-day meetings never conflict.\
+\- Totals above 54 require approval; exactly 54 does not. Unit totals include all courses.\
+\- Filtering checks course number and title, case-insensitively. An empty filter shows everything.\
+\
+My list of what each function should do and how it could go wrong:\
+\
+timeToMinutes\
+&#x20; Should do: Convert "HH:MM" into the number of minutes since midnight.\
+&#x20; One way it could go wrong: It only counts the minutes for the hours and forgets to add the minutes part.\
+\
+formatTime\
+&#x20; Should do: Convert a 24-hour time into 12-hour time and add AM or PM.\
+&#x20; One way it could go wrong: It shows noon "12:00" incorrectly as "12:00 AM".\
+\
+findConflict\
+&#x20; Should do: Find an existing course whose meeting time overlaps the candidate's; when there is no conflict, return the correct no-conflict result.\
+&#x20; One way it could go wrong: It treats one course ending exactly when another starts as a conflict.\
+\
+summarizeUnits\
+&#x20; Should do: Compute the total units of all courses and decide whether the total is over the unit limit.\
+&#x20; One way it could go wrong: It computes the total correctly but uses >=, so a total that exactly reaches the limit is wrongly reported as over.\
+\
+filterCourses\
+&#x20; Should do: Filter courses by the search text and return the matching courses.\
+&#x20; One way it could go wrong: The search is case sensitive, so courses whose text is the same but differs in letter case do not match.\
+\
+Task: write about 3 to 5 tests per function (timeToMinutes already has one, add a few more in tests/timeToMinutes.test.js; findConflict, formatTime, summarizeUnits and filterCourses each get several). Then run \`node --test\` and report: the full output, which tests pass and which fail, and for every failing test the expected value, the actual value, and which line of the specification the test was based on. Do not propose or make fixes. Also list anything you were tempted to change but did not.\
+~~~~
