@@ -4,7 +4,7 @@ export function timeToMinutes(hhmm) {
 
 export function formatTime(hhmm) {
   const hour = Number(hhmm.slice(0, 2));
-  return (hour % 12) + ":" + hhmm.slice(3, 5) + (hour < 12 ? " AM" : " PM");
+  return (hour % 12 || 12) + ":" + hhmm.slice(3, 5) + (hour < 12 ? " AM" : " PM");
 }
 
 export function findConflict(candidate, courses) {
@@ -25,7 +25,7 @@ export function findConflict(candidate, courses) {
     const otherStart = timeToMinutes(course.start);
     const otherEnd = timeToMinutes(course.end);
 
-    if (startMinutes <= otherEnd && otherStart <= endMinutes) {
+    if (startMinutes < otherEnd && otherStart < endMinutes) {
       return course;
     }
   }
