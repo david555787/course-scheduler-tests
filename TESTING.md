@@ -105,4 +105,4 @@ Limitations of the experiment: both bugs were simple, and the README specifies t
 
 Codex (5.6 Sol Medium, 6 Luna Medium) helped with the refactor, with writing tests from my list, and with the verifier experiment. The prompts were drafted with help from Claude and are recorded in `prompt_log.md`. I personally wrote the first test and the three reinforcing tests, carried out the break-it changes and restorations, and wrote this document.
 
-Claude (claude.ai chat) also helped me plan the steps, read and analyze the command output I pasted, suggest the list of break-it changes, and suggest the exact one-line code for the bug fixes in `e96537f`, which I applied myself. This English version was translated from my Chinese original with Claude.
+Claude (claude.ai chat) also helped me plan the steps, read and analyze the command output I pasted, suggest the list of break-it changes, and suggest the exact one-line code for the bug fixes in `e96537f`, which I applied myself.
