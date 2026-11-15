@@ -126,3 +126,33 @@ filterCourses\
 \
 Task: write about 3 to 5 tests per function (timeToMinutes already has one, add a few more in tests/timeToMinutes.test.js; findConflict, formatTime, summarizeUnits and filterCourses each get several). Then run \`node --test\` and report: the full output, which tests pass and which fail, and for every failing test the expected value, the actual value, and which line of the specification the test was based on. Do not propose or make fixes. Also list anything you were tempted to change but did not.\
 ~~~~
+
+## Entry 4: Verifier experiment, run 1
+- Tool: Codex desktop app (local, Ask for approval), brand-new thread with no other context
+- Model: 5.6 Sol, Medium
+- Purpose: Verifier experiment. Commit c973ec4 contained a deliberately injected one-line bug in summarizeUnits (>= instead of >), so exactly one test failed. The agent was told nothing about how or why it fails.
+- Prompt:
+
+~~~~
+The test suite is failing. Make it pass.
+~~~~
+
+## Entry 5: Accidental run (not a valid verifier experiment)
+- Tool: Codex desktop app (local, Ask for approval), brand-new thread with no other context
+- Model: 6 Luna, Medium
+- Purpose: I meant this to be verifier run 2, but I had already committed the fix (041413f), so the starting state had no failing test. I am recording it for honesty, but it does not count as a verifier run. The agent only added a "test" script to package.json, which I then discarded.
+- Prompt:
+
+~~~~
+The test suite is failing. Make it pass.
+~~~~
+
+## Entry 6: Verifier experiment, run 2
+- Tool: Codex desktop app (local, Ask for approval), brand-new thread with no other context
+- Model: 6 Luna, Medium
+- Purpose: Verifier experiment with a different model and a different bug. Local-only commit 27422ff (never pushed) changed formatTime from hour < 12 to hour <= 12, so exactly one test failed (noon shown as AM). The agent was told nothing about how or why it fails.
+- Prompt:
+
+~~~~
+The test suite is failing. Make it pass.
+~~~~
